@@ -21,24 +21,38 @@ const LoginPage: React.FC = () => {
     }
   }, [user, router]);
 
+  const validateEmail = (value: string): string | undefined => {
+    const trimmedEmail = value.trim();
+    if (!trimmedEmail) {
+      return 'Email address is required';
+    }
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/i;
+    if (!emailRegex.test(trimmedEmail)) {
+      return 'Please enter a valid email address (e.g., user@example.com)';
+    }
+    return undefined;
+  };
+
+  const validatePassword = (value: string): string | undefined => {
+    if (!value) {
+      return 'Password is required';
+    }
+    return undefined;
+  };
+
   const validate = (): boolean => {
     const errors: { email?: string; password?: string } = {};
     let isValid = true;
 
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail) {
-      errors.email = 'Email address is required';
+    const emailError = validateEmail(email);
+    if (emailError) {
+      errors.email = emailError;
       isValid = false;
-    } else {
-      const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/i;
-      if (!emailRegex.test(trimmedEmail)) {
-        errors.email = 'Please enter a valid email address (e.g., user@example.com)';
-        isValid = false;
-      }
     }
 
-    if (!password) {
-      errors.password = 'Password is required';
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      errors.password = passwordError;
       isValid = false;
     }
 
@@ -93,9 +107,14 @@ const LoginPage: React.FC = () => {
               value={email}
               onChange={e => {
                 setEmail(e.target.value);
-                if (fieldErrors.email) {
+                // Only clear error if the field is now valid (returns undefined)
+                if (fieldErrors.email && validateEmail(e.target.value) === undefined) {
                   setFieldErrors({ ...fieldErrors, email: undefined });
                 }
+              }}
+              onBlur={() => {
+                const error = validateEmail(email);
+                setFieldErrors({ ...fieldErrors, email: error });
               }}
               disabled={loading || submitting}
               required
@@ -126,9 +145,14 @@ const LoginPage: React.FC = () => {
                 value={password}
                 onChange={e => {
                   setPassword(e.target.value);
-                  if (fieldErrors.password) {
+                  // Only clear error if the field is now valid (returns undefined)
+                  if (fieldErrors.password && validatePassword(e.target.value) === undefined) {
                     setFieldErrors({ ...fieldErrors, password: undefined });
                   }
+                }}
+                onBlur={() => {
+                  const error = validatePassword(password);
+                  setFieldErrors({ ...fieldErrors, password: error });
                 }}
                 disabled={loading || submitting}
                 required

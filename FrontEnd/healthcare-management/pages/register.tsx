@@ -19,41 +19,69 @@ const RegisterPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const validateName = (value: string): string | undefined => {
+    const trimmedName = value.trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      return 'Name must be at least 2 characters long';
+    }
+    return undefined;
+  };
+
+  const validateEmail = (value: string): string | undefined => {
+    const trimmedEmail = value.trim();
+    if (!trimmedEmail) {
+      return 'Email address is required';
+    }
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/i;
+    if (!emailRegex.test(trimmedEmail)) {
+      return 'Please enter a valid email address (e.g., user@example.com)';
+    }
+    return undefined;
+  };
+
+  const validatePassword = (value: string): string | undefined => {
+    if (!value || value.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+    const strongRegex = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+/;
+    if (!strongRegex.test(value)) {
+      return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
+    }
+    return undefined;
+  };
+
+  const validateConfirmPassword = (value: string, passwordToMatch: string): string | undefined => {
+    if (value !== passwordToMatch) {
+      return 'Passwords do not match';
+    }
+    return undefined;
+  };
+
   const validate = (): boolean => {
     const errors: { name?: string; email?: string; password?: string; confirmPassword?: string } = {};
     let isValid = true;
 
-    const trimmedName = name.trim();
-    if (!trimmedName || trimmedName.length < 2) {
-      errors.name = 'Name must be at least 2 characters long';
+    const nameError = validateName(name);
+    if (nameError) {
+      errors.name = nameError;
       isValid = false;
     }
 
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail) {
-      errors.email = 'Email address is required';
+    const emailError = validateEmail(email);
+    if (emailError) {
+      errors.email = emailError;
       isValid = false;
-    } else {
-      const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/i;
-      if (!emailRegex.test(trimmedEmail)) {
-        errors.email = 'Please enter a valid email address (e.g., user@example.com)';
-        isValid = false;
-      }
     }
 
-    if (!password || password.length < 8) {
-      errors.password = 'Password must be at least 8 characters long';
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      errors.password = passwordError;
       isValid = false;
-    } else {
-      const strongRegex = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+/;
-      if (!strongRegex.test(password)) {
-        errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
-        isValid = false;
-      }
     }
 
-    if (password !== confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
+    const confirmPasswordError = validateConfirmPassword(confirmPassword, password);
+    if (confirmPasswordError) {
+      errors.confirmPassword = confirmPasswordError;
       isValid = false;
     }
 
@@ -113,9 +141,13 @@ const RegisterPage: React.FC = () => {
               value={name}
               onChange={e => {
                 setName(e.target.value);
-                if (fieldErrors.name) {
+                if (fieldErrors.name && validateName(e.target.value) === undefined) {
                   setFieldErrors({ ...fieldErrors, name: undefined });
                 }
+              }}
+              onBlur={() => {
+                const error = validateName(name);
+                setFieldErrors({ ...fieldErrors, name: error });
               }}
               disabled={loading || submitting}
               required
@@ -145,9 +177,13 @@ const RegisterPage: React.FC = () => {
               value={email}
               onChange={e => {
                 setEmail(e.target.value);
-                if (fieldErrors.email) {
+                if (fieldErrors.email && validateEmail(e.target.value) === undefined) {
                   setFieldErrors({ ...fieldErrors, email: undefined });
                 }
+              }}
+              onBlur={() => {
+                const error = validateEmail(email);
+                setFieldErrors({ ...fieldErrors, email: error });
               }}
               disabled={loading || submitting}
               required
@@ -178,13 +214,17 @@ const RegisterPage: React.FC = () => {
                 value={password}
                 onChange={e => {
                   setPassword(e.target.value);
-                  if (fieldErrors.password) {
+                  if (fieldErrors.password && validatePassword(e.target.value) === undefined) {
                     setFieldErrors({ ...fieldErrors, password: undefined });
                   }
                   // Clear confirm password error if passwords now match
                   if (fieldErrors.confirmPassword && e.target.value === confirmPassword) {
                     setFieldErrors({ ...fieldErrors, confirmPassword: undefined });
                   }
+                }}
+                onBlur={() => {
+                  const error = validatePassword(password);
+                  setFieldErrors({ ...fieldErrors, password: error });
                 }}
                 disabled={loading || submitting}
                 required
@@ -224,9 +264,13 @@ const RegisterPage: React.FC = () => {
                 value={confirmPassword}
                 onChange={e => {
                   setConfirmPassword(e.target.value);
-                  if (fieldErrors.confirmPassword) {
+                  if (fieldErrors.confirmPassword && validateConfirmPassword(e.target.value, password) === undefined) {
                     setFieldErrors({ ...fieldErrors, confirmPassword: undefined });
                   }
+                }}
+                onBlur={() => {
+                  const error = validateConfirmPassword(confirmPassword, password);
+                  setFieldErrors({ ...fieldErrors, confirmPassword: error });
                 }}
                 disabled={loading || submitting}
                 required

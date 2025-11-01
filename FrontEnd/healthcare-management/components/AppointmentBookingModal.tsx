@@ -81,6 +81,47 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
     setSelectedDoctorId(id);
   };
 
+  const validateDoctor = (): string | undefined => {
+    if (!selectedDoctorId) {
+      return 'Please select a doctor for your appointment';
+    }
+    return undefined;
+  };
+
+  const validateDate = (dateValue: string): string | undefined => {
+    if (!dateValue) {
+      return 'Please select an appointment date';
+    }
+    const selectedDate = new Date(dateValue);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+      return 'Appointment date cannot be in the past';
+    }
+    return undefined;
+  };
+
+  const validateTime = (timeValue: string): string | undefined => {
+    if (!timeValue) {
+      return 'Please select a time slot for your appointment';
+    }
+    return undefined;
+  };
+
+  const handleDateBlur = () => {
+    if (date) {
+      const error = validateDate(date);
+      setFieldErrors({ ...fieldErrors, date: error });
+    }
+  };
+
+  const handleTimeBlur = () => {
+    if (time) {
+      const error = validateTime(time);
+      setFieldErrors({ ...fieldErrors, time: error });
+    }
+  };
+
   const fetchRecommendations = async () => {
     setError(null);
     setSuccessMsg(null);
@@ -120,26 +161,21 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
     const errors: { doctor?: string; date?: string; time?: string } = {};
     let isValid = true;
 
-    if (!selectedDoctorId) {
-      errors.doctor = 'Please select a doctor for your appointment';
+    const doctorError = validateDoctor();
+    if (doctorError) {
+      errors.doctor = doctorError;
       isValid = false;
     }
 
-    if (!date) {
-      errors.date = 'Please select an appointment date';
+    const dateError = validateDate(date);
+    if (dateError) {
+      errors.date = dateError;
       isValid = false;
-    } else {
-      const selectedDate = new Date(date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        errors.date = 'Appointment date cannot be in the past';
-        isValid = false;
-      }
     }
 
-    if (!time) {
-      errors.time = 'Please select a time slot for your appointment';
+    const timeError = validateTime(time);
+    if (timeError) {
+      errors.time = timeError;
       isValid = false;
     }
 
@@ -230,6 +266,7 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
                         checked={selectedDoctorId === doctor.id.toString()}
                         onChange={() => {
                           handleDoctorSelect(doctor.id.toString());
+                          // When a doctor is selected, they have a value, so clear any error
                           if (fieldErrors.doctor) {
                             setFieldErrors({ ...fieldErrors, doctor: undefined });
                           }
@@ -324,10 +361,11 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
               value={date}
               onChange={e => {
                 handleDateChange(e);
-                if (fieldErrors.date) {
+                if (fieldErrors.date && validateDate(e.target.value) === undefined) {
                   setFieldErrors({ ...fieldErrors, date: undefined });
                 }
               }}
+              onBlur={handleDateBlur}
               min={new Date().toISOString().split('T')[0]}
               required
               aria-invalid={!!fieldErrors.date}
@@ -354,10 +392,11 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
               value={time}
               onChange={e => {
                 handleTimeChange(e);
-                if (fieldErrors.time) {
+                if (fieldErrors.time && validateTime(e.target.value) === undefined) {
                   setFieldErrors({ ...fieldErrors, time: undefined });
                 }
               }}
+              onBlur={handleTimeBlur}
               required
               aria-invalid={!!fieldErrors.time}
               aria-describedby={fieldErrors.time ? 'time-error' : undefined}
