@@ -13,3 +13,4 @@ C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\refint\HealthcareManagement.Persistence.dll
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.pdb
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\ref\HealthcareManagement.Persistence.dll
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.sourcelink.json

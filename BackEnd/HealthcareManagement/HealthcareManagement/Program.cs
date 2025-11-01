@@ -18,6 +18,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Pr
 builder.Services.AddScoped<HealthcareManagement.Persistence.IUnitOfWork, HealthcareManagement.Persistence.UnitOfWork>();
 builder.Services.AddScoped(typeof(HealthcareManagement.Persistence.IRepository<>), typeof(HealthcareManagement.Persistence.Repository<>));
 builder.Services.AddScoped<HealthcareManagement.Service.IDoctorService, HealthcareManagement.Service.DoctorService>();
+builder.Services.AddScoped<HealthcareManagement.Service.IDoctorRecommendationService, HealthcareManagement.Service.DoctorRecommendationService>();
 builder.Services.AddScoped<HealthcareManagement.Service.IAuthService, HealthcareManagement.Service.AuthService>();
 builder.Services.AddScoped<HealthcareManagement.Service.IAppointmentService, HealthcareManagement.Service.AppointmentService>();
 

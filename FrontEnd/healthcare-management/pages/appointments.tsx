@@ -65,28 +65,28 @@ const AppointmentsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto bg-white p-6 rounded shadow">
+      <div className="max-w-5xl mx-auto bg-surface dark:bg-surface-elevated p-6 rounded-lg shadow-lg border border-border dark:border-divider transition-colors">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Your Appointments</h1>
+          <h1 className="text-2xl font-semibold text-text-primary dark:text-text-primary">Your Appointments</h1>
           <button
             onClick={openModal}
-            className="bg-secondary text-white px-4 py-2 rounded hover:bg-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+            className="bg-secondary dark:bg-secondary-dark text-white px-4 py-2 rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-opacity font-medium"
           >
             Book Appointment
           </button>
         </div>
 
-        {loadingAppointments && <p>Loading appointments...</p>}
-        {error && <p className="text-danger font-medium">{error}</p>}
+        {loadingAppointments && <p className="text-text-secondary dark:text-text-secondary">Loading appointments...</p>}
+        {error && <p className="text-danger dark:text-danger font-medium">{error}</p>}
 
         {!loadingAppointments && appointments.length === 0 && !error && (
-          <p>You currently have no appointments scheduled.</p>
+          <p className="text-text-secondary dark:text-text-secondary">You currently have no appointments scheduled.</p>
         )}
 
         {!loadingAppointments && appointments.length > 0 && (
           <div className="overflow-x-auto">
-            <table className="w-full border border-gray-300 rounded">
-              <thead className="bg-primary text-white">
+            <table className="w-full border border-border dark:border-divider rounded-lg">
+              <thead className="bg-primary dark:bg-primary-dark text-white">
                 <tr>
                   <th className="px-4 py-2 text-left">Date</th>
                   <th className="px-4 py-2 text-left">Time</th>
@@ -99,12 +99,24 @@ const AppointmentsPage: React.FC = () => {
                   <tr
                     key={app.id}
                     id={`appointment-row-${app.id}`}
-                    className={`border-t border-gray-300 ${highlightId === String(app.id) ? 'bg-yellow-100 transition-colors' : ''}`}
+                    className={`border-t border-border dark:border-divider text-text-primary dark:text-text-primary ${
+                      highlightId === String(app.id)
+                        ? 'bg-accent/10 dark:bg-accent/20 transition-colors'
+                        : 'hover:bg-surface-elevated dark:hover:bg-surface transition-colors'
+                    }`}
                   >
                     <td className="px-4 py-2">{app.date}</td>
                     <td className="px-4 py-2">{app.time}</td>
                     <td className="px-4 py-2">{app.doctorName}</td>
-                    <td className="px-4 py-2 capitalize">{app.status}</td>
+                    <td className="px-4 py-2 capitalize">
+                      <span className={`inline-block px-2 py-1 rounded text-sm ${
+                        app.status === 'scheduled' ? 'bg-info/20 text-info dark:bg-info/30' :
+                        app.status === 'completed' ? 'bg-success/20 text-success dark:bg-success/30' :
+                        'bg-danger/20 text-danger dark:bg-danger/30'
+                      }`}>
+                        {app.status}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

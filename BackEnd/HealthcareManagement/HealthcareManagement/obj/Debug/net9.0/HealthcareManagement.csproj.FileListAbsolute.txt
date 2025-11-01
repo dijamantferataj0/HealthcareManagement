@@ -148,3 +148,4 @@ C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.genruntimeconfig.cache
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\ref\HealthcareManagement.dll
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.sourcelink.json

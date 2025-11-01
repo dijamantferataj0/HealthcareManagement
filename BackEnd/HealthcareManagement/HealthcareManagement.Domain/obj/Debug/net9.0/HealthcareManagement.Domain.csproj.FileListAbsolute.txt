@@ -9,3 +9,4 @@ C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Domain\obj\Debug\net9.0\refint\HealthcareManagement.Domain.dll
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Domain\obj\Debug\net9.0\HealthcareManagement.Domain.pdb
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Domain\obj\Debug\net9.0\ref\HealthcareManagement.Domain.dll
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Domain\obj\Debug\net9.0\HealthcareManagement.Domain.sourcelink.json

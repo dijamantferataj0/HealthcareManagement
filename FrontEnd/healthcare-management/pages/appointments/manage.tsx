@@ -102,22 +102,22 @@ const ManageAppointmentsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto bg-white p-6 rounded shadow">
+      <div className="max-w-5xl mx-auto bg-surface dark:bg-surface-elevated p-6 rounded-lg shadow-lg border border-border dark:border-divider transition-colors">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Manage Appointments</h1>
+          <h1 className="text-2xl font-semibold text-text-primary dark:text-text-primary">Manage Appointments</h1>
         </div>
 
-        {loadingAppointments && <p>Loading appointments...</p>}
-        {error && <p className="text-danger font-medium">{error}</p>}
+        {loadingAppointments && <p className="text-text-secondary dark:text-text-secondary">Loading appointments...</p>}
+        {error && <p className="text-danger dark:text-danger font-medium">{error}</p>}
 
         {!loadingAppointments && appointments.length === 0 && !error && (
-          <p>You currently have no appointments scheduled.</p>
+          <p className="text-text-secondary dark:text-text-secondary">You currently have no appointments scheduled.</p>
         )}
 
         {!loadingAppointments && appointments.length > 0 && (
           <div className="overflow-x-auto">
-            <table className="w-full border border-gray-300 rounded">
-              <thead className="bg-primary text-white">
+            <table className="w-full border border-border dark:border-divider rounded-lg">
+              <thead className="bg-primary dark:bg-primary-dark text-white">
                 <tr>
                   <th className="px-4 py-2 text-left">Date</th>
                   <th className="px-4 py-2 text-left">Time</th>
@@ -128,12 +128,12 @@ const ManageAppointmentsPage: React.FC = () => {
               </thead>
               <tbody>
                 {appointments.map(app => (
-                  <tr key={app.id} className="border-t border-gray-300">
+                  <tr key={app.id} className="border-t border-border dark:border-divider text-text-primary dark:text-text-primary hover:bg-surface-elevated dark:hover:bg-surface transition-colors">
                     <td className="px-4 py-2">
                       {editingId === app.id ? (
                         <input
                           type="date"
-                          className="border border-gray-300 rounded px-2 py-1"
+                          className="border border-border dark:border-divider rounded-lg px-2 py-1 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                           value={editDate}
                           onChange={e => setEditDate(e.target.value)}
                         />
@@ -145,7 +145,7 @@ const ManageAppointmentsPage: React.FC = () => {
                       {editingId === app.id ? (
                         <input
                           type="time"
-                          className="border border-gray-300 rounded px-2 py-1"
+                          className="border border-border dark:border-divider rounded-lg px-2 py-1 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                           value={editTime}
                           onChange={e => setEditTime(e.target.value)}
                         />
@@ -154,25 +154,33 @@ const ManageAppointmentsPage: React.FC = () => {
                       )}
                     </td>
                     <td className="px-4 py-2">{app.doctorName}</td>
-                    <td className="px-4 py-2 capitalize">{app.status}</td>
+                    <td className="px-4 py-2 capitalize">
+                      <span className={`inline-block px-2 py-1 rounded text-sm ${
+                        app.status === 'scheduled' ? 'bg-info/20 text-info dark:bg-info/30' :
+                        app.status === 'completed' ? 'bg-success/20 text-success dark:bg-success/30' :
+                        'bg-danger/20 text-danger dark:bg-danger/30'
+                      }`}>
+                        {app.status}
+                      </span>
+                    </td>
                     <td className="px-4 py-2">
                       {editingId === app.id ? (
                         <div className="flex gap-2">
-                          <button onClick={saveEdit} className="bg-primary text-white px-3 py-1 rounded hover:bg-primary/90">Save</button>
-                          <button onClick={cancelEdit} className="border border-gray-300 px-3 py-1 rounded hover:bg-gray-100">Cancel</button>
+                          <button onClick={saveEdit} className="bg-primary dark:bg-primary-dark text-white px-3 py-1 rounded-lg hover:opacity-90 transition-opacity font-medium">Save</button>
+                          <button onClick={cancelEdit} className="border border-border dark:border-divider px-3 py-1 rounded-lg hover:bg-surface-elevated dark:hover:bg-surface text-text-primary dark:text-text-primary transition-colors font-medium">Cancel</button>
                         </div>
                       ) : (
                         <div className="flex gap-2">
                           <button
                             onClick={() => startEdit(app)}
-                            className="bg-secondary text-white px-3 py-1 rounded hover:bg-secondary/90"
+                            className="bg-secondary dark:bg-secondary-dark text-white px-3 py-1 rounded-lg hover:opacity-90 transition-opacity font-medium"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => onCancel(app.id)}
                             disabled={cancellingId === app.id}
-                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 disabled:opacity-50"
+                            className="bg-danger dark:bg-danger text-white px-3 py-1 rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity font-medium"
                           >
                             {cancellingId === app.id ? 'Cancelling...' : 'Cancel'}
                           </button>

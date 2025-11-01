@@ -70,18 +70,18 @@ const RegisterPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-        <h1 className="text-2xl font-semibold mb-6">Register</h1>
+      <div className="max-w-md mx-auto bg-surface dark:bg-surface-elevated p-6 rounded-lg shadow-lg border border-border dark:border-divider transition-colors">
+        <h1 className="text-2xl font-semibold mb-6 text-text-primary dark:text-text-primary">Register</h1>
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
-            <label htmlFor="name" className="block font-medium mb-1">
+            <label htmlFor="name" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
               Name
             </label>
             <input
               id="name"
               type="text"
               name="name"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
               value={name}
               onChange={e => setName(e.target.value)}
               disabled={loading || submitting}
@@ -90,14 +90,14 @@ const RegisterPage: React.FC = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="email" className="block font-medium mb-1">
+            <label htmlFor="email" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
               Email
             </label>
             <input
               id="email"
               type="email"
               name="email"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={loading || submitting}
@@ -106,7 +106,7 @@ const RegisterPage: React.FC = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="block font-medium mb-1">
+            <label htmlFor="password" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
               Password
             </label>
             <div className="relative">
@@ -114,7 +114,7 @@ const RegisterPage: React.FC = () => {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
-                className="w-full border border-gray-300 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 pr-10 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 disabled={loading || submitting}
@@ -124,7 +124,7 @@ const RegisterPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(v => !v)}
-                className="absolute inset-y-0 right-2 text-sm text-gray-600"
+                className="absolute inset-y-0 right-2 text-sm text-text-secondary dark:text-text-tertiary hover:text-text-primary dark:hover:text-text-secondary transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? 'Hide' : 'Show'}
@@ -132,7 +132,7 @@ const RegisterPage: React.FC = () => {
             </div>
           </div>
           <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block font-medium mb-1">
+            <label htmlFor="confirmPassword" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
               Confirm Password
             </label>
             <div className="relative">
@@ -140,7 +140,7 @@ const RegisterPage: React.FC = () => {
                 id="confirmPassword"
                 type={showConfirm ? 'text' : 'password'}
                 name="confirmPassword"
-                className="w-full border border-gray-300 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 pr-10 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 disabled={loading || submitting}
@@ -150,19 +150,19 @@ const RegisterPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowConfirm(v => !v)}
-                className="absolute inset-y-0 right-2 text-sm text-gray-600"
+                className="absolute inset-y-0 right-2 text-sm text-text-secondary dark:text-text-tertiary hover:text-text-primary dark:hover:text-text-secondary transition-colors"
                 aria-label={showConfirm ? 'Hide password' : 'Show password'}
               >
                 {showConfirm ? 'Hide' : 'Show'}
               </button>
             </div>
           </div>
-          {formError && <p className="mb-4 text-danger font-medium">{formError}</p>}
-          {successMsg && <p className="mb-4 text-green-600 font-medium">{successMsg}</p>}
+          {formError && <p className="mb-4 text-danger dark:text-danger font-medium">{formError}</p>}
+          {successMsg && <p className="mb-4 text-success dark:text-success font-medium">{successMsg}</p>}
           <button
             type="submit"
             disabled={loading || submitting}
-            className="w-full bg-primary text-white py-2 rounded hover:bg-primary/90 disabled:opacity-50"
+            className="w-full bg-primary dark:bg-primary-dark text-white py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity font-medium"
           >
             {loading || submitting ? 'Registering...' : 'Register'}
           </button>

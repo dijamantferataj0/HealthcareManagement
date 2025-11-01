@@ -127,24 +127,24 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm transition-colors"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative"
+        className="bg-surface dark:bg-surface-elevated rounded-lg shadow-2xl max-w-lg w-full p-6 relative border border-border dark:border-divider max-h-[90vh] overflow-y-auto transition-colors"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold mb-4">Book New Appointment</h2>
+        <h2 className="text-xl font-semibold mb-4 text-text-primary dark:text-text-primary">Book New Appointment</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="symptoms" className="block font-medium mb-1">
-              Symptoms <span className="text-danger">*</span>
+            <label htmlFor="symptoms" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
+              Symptoms <span className="text-danger dark:text-danger">*</span>
             </label>
             <textarea
               id="symptoms"
               name="symptoms"
               rows={3}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
               value={symptoms}
               onChange={handleSymptomsChange}
               required
@@ -155,18 +155,18 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
               type="button"
               onClick={fetchRecommendations}
               disabled={loadingRecommendations}
-              className="bg-secondary text-white px-4 py-2 rounded hover:bg-secondary/90 disabled:opacity-50"
+              className="bg-secondary dark:bg-secondary-dark text-white px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity font-medium"
             >
               {loadingRecommendations ? 'Fetching Recommendations...' : 'Get Doctor Recommendations'}
             </button>
           </div>
-          {error && <div className="text-danger font-medium">{error}</div>}
+          {error && <div className="text-danger dark:text-danger font-medium">{error}</div>}
           {recommendedDoctors.length > 0 && (
             <div>
-              <p className="font-medium mb-2">Recommended Doctors:</p>
-              <ul className="max-h-48 overflow-y-auto border border-gray-300 rounded p-2 space-y-2">
+              <p className="font-medium mb-2 text-text-primary dark:text-text-primary">Recommended Doctors:</p>
+              <ul className="max-h-48 overflow-y-auto border border-border dark:border-divider rounded-lg p-2 space-y-2 bg-surface dark:bg-surface transition-colors">
                 {recommendedDoctors.map(doctor => (
-                  <li key={doctor.id} className="flex items-center space-x-3">
+                  <li key={doctor.id} className="flex items-center space-x-3 p-2 hover:bg-surface-elevated dark:hover:bg-surface rounded transition-colors">
                     <input
                       type="radio"
                       id={`doctor-${doctor.id}`}
@@ -174,10 +174,11 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
                       value={doctor.id.toString()}
                       checked={selectedDoctorId === doctor.id.toString()}
                       onChange={() => handleDoctorSelect(doctor.id.toString())}
+                      className="accent-primary"
                       required
                     />
-                    <label htmlFor={`doctor-${doctor.id}`} className="flex-grow cursor-pointer">
-                      <span className="font-semibold">{doctor.name}</span> - {doctor.specialization}
+                    <label htmlFor={`doctor-${doctor.id}`} className="flex-grow cursor-pointer text-text-primary dark:text-text-primary">
+                      <span className="font-semibold">{doctor.name}</span> - <span className="text-text-secondary dark:text-text-secondary">{doctor.specialization}</span>
                     </label>
                   </li>
                 ))}
@@ -185,14 +186,14 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
             </div>
           )}
           <div>
-            <label htmlFor="date" className="block font-medium mb-1">
-              Appointment Date <span className="text-danger">*</span>
+            <label htmlFor="date" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
+              Appointment Date <span className="text-danger dark:text-danger">*</span>
             </label>
             <input
               id="date"
               name="date"
               type="date"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
               value={date}
               onChange={handleDateChange}
               min={new Date().toISOString().split('T')[0]}
@@ -200,13 +201,13 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
             />
           </div>
           <div>
-            <label htmlFor="time" className="block font-medium mb-1">
-              Time Slot <span className="text-danger">*</span>
+            <label htmlFor="time" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
+              Time Slot <span className="text-danger dark:text-danger">*</span>
             </label>
             <select
               id="time"
               name="time"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
               value={time}
               onChange={handleTimeChange}
               required
@@ -223,19 +224,19 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+              className="px-4 py-2 border border-border dark:border-divider rounded-lg hover:bg-surface-elevated dark:hover:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={bookingLoading}
-              className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="bg-primary dark:bg-primary-dark text-white px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-opacity font-medium"
             >
               {bookingLoading ? 'Booking...' : 'Book Appointment'}
             </button>
           </div>
-          {successMsg && <p className="text-green-600 font-medium">{successMsg}</p>}
+          {successMsg && <p className="text-success dark:text-success font-medium">{successMsg}</p>}
         </form>
       </div>
     </div>
