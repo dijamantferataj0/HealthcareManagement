@@ -5,8 +5,49 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function checkResponse(res: Response) {
   if (!res.ok) {
+    // If token is expired (401 Unauthorized), clear the token and redirect to login
+    if (res.status === 401 && typeof window !== 'undefined') {
+      const { removeTokenCookie } = await import('@/lib/cookies');
+      removeTokenCookie();
+      // Also clear localStorage if it exists
+      localStorage.removeItem('healthcare_token');
+      // Clear user session by reloading (which will trigger auth context to clear user)
+      window.location.href = '/login';
+      throw new Error('Your session has expired. Please log in again.');
+    }
     const errorJson = await res.json().catch(() => null);
-    const errorMessage = errorJson?.message || res.statusText || 'API Error';
+    // Extract meaningful error message from response
+    let errorMessage = errorJson?.message || errorJson?.error || res.statusText;
+    
+    // Handle validation errors (typically 400 Bad Request)
+    if (res.status === 400 && errorJson?.errors) {
+      // If there are multiple field errors, combine them
+      const fieldErrors = Object.entries(errorJson.errors)
+        .map(([field, messages]: [string, any]) => {
+          const msg = Array.isArray(messages) ? messages[0] : messages;
+          return `${field}: ${msg}`;
+        })
+        .join(', ');
+      errorMessage = fieldErrors || errorMessage;
+    }
+    
+    // Provide semantic status-based messages if no specific message
+    if (!errorMessage || errorMessage === 'Bad Request' || errorMessage === 'API Error') {
+      switch (res.status) {
+        case 400:
+          errorMessage = 'Invalid request. Please check your input and try again';
+          break;
+        case 404:
+          errorMessage = 'The requested resource was not found';
+          break;
+        case 500:
+          errorMessage = 'Server error. Please try again later or contact support';
+          break;
+        default:
+          errorMessage = errorMessage || 'An error occurred. Please try again';
+      }
+    }
+    
     throw new Error(errorMessage);
   }
   return res.json();
@@ -72,6 +113,14 @@ export async function cancelAppointment(token: string, appointmentId: string | n
     method: 'DELETE',
     headers: getAuthHeaders(token)
   });
+  // Handle 401 Unauthorized (expired token)
+  if (res.status === 401 && typeof window !== 'undefined') {
+    const { removeTokenCookie } = await import('@/lib/cookies');
+    removeTokenCookie();
+    localStorage.removeItem('healthcare_token');
+    window.location.href = '/login';
+    throw new Error('Your session has expired. Please log in again.');
+  }
   if (!res.ok && res.status !== 204) {
     const errorJson = await res.json().catch(() => null);
     throw new Error(errorJson?.message || res.statusText || 'Failed to cancel appointment');
@@ -102,6 +151,20 @@ export async function getAIRecommendations(symptoms: string): Promise<DoctorReco
     body: JSON.stringify({ symptoms })
   });
   return checkResponse(res);
+}
+
+export async function fetchDoctors(): Promise<DoctorRecommendation[]> {
+  const res = await fetch(`${API_URL}${API_ENDPOINTS.DOCTORS}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const data = await checkResponse(res);
+  // Map backend DoctorDto to frontend DoctorRecommendation
+  return (data as any[]).map((d: any) => ({
+    id: d.id ?? d.Id,
+    name: d.name ?? d.Name,
+    specialization: d.specialization ?? d.Specialization ?? ''
+  }));
 }
 
 

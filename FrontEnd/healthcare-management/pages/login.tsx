@@ -2,6 +2,7 @@ import React, { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/hooks/useAuth';
+import { getSemanticErrorMessage, getFieldErrorMessage } from '@/lib/errorMessages';
 
 const LoginPage: React.FC = () => {
   const { user, login, loading } = useAuth();
@@ -10,6 +11,7 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -20,22 +22,29 @@ const LoginPage: React.FC = () => {
   }, [user, router]);
 
   const validate = (): boolean => {
+    const errors: { email?: string; password?: string } = {};
+    let isValid = true;
+
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
-      setFormError('Email is required.');
-      return false;
+      errors.email = 'Email address is required';
+      isValid = false;
+    } else {
+      const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/i;
+      if (!emailRegex.test(trimmedEmail)) {
+        errors.email = 'Please enter a valid email address (e.g., user@example.com)';
+        isValid = false;
+      }
     }
-    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/i;
-    if (!emailRegex.test(trimmedEmail)) {
-      setFormError('Valid email is required.');
-      return false;
-    }
+
     if (!password) {
-      setFormError('Password is required.');
-      return false;
+      errors.password = 'Password is required';
+      isValid = false;
     }
+
+    setFieldErrors(errors);
     setFormError(null);
-    return true;
+    return isValid;
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -43,11 +52,21 @@ const LoginPage: React.FC = () => {
     if (!validate()) return;
     setSubmitting(true);
     setFormError(null);
+    setFieldErrors({});
     try {
       await login(email.trim(), password);
       router.push('/appointments');
     } catch (err) {
-      setFormError((err as Error).message || 'Login failed');
+      const semanticError = getSemanticErrorMessage(err);
+      setFormError(semanticError);
+      
+      // Set field-specific errors if available
+      const emailError = getFieldErrorMessage(err, 'email');
+      const passwordError = getFieldErrorMessage(err, 'password');
+      setFieldErrors({
+        ...(emailError && { email: emailError }),
+        ...(passwordError && { password: passwordError })
+      });
     } finally {
       setSubmitting(false);
     }
@@ -66,13 +85,29 @@ const LoginPage: React.FC = () => {
               id="email"
               type="email"
               name="email"
-              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+              className={`w-full border rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 transition-colors ${
+                fieldErrors.email
+                  ? 'border-danger dark:border-danger focus:ring-danger'
+                  : 'border-border dark:border-divider focus:ring-primary'
+              }`}
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => {
+                setEmail(e.target.value);
+                if (fieldErrors.email) {
+                  setFieldErrors({ ...fieldErrors, email: undefined });
+                }
+              }}
               disabled={loading || submitting}
               required
               autoComplete="email"
+              aria-invalid={!!fieldErrors.email}
+              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
             />
+            {fieldErrors.email && (
+              <p id="email-error" className="mt-1 text-sm text-danger dark:text-danger" role="alert">
+                {fieldErrors.email}
+              </p>
+            )}
           </div>
           <div className="mb-4">
             <label htmlFor="password" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
@@ -83,12 +118,23 @@ const LoginPage: React.FC = () => {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
-                className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 pr-10 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+                className={`w-full border rounded-lg px-3 py-2 pr-10 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 transition-colors ${
+                  fieldErrors.password
+                    ? 'border-danger dark:border-danger focus:ring-danger'
+                    : 'border-border dark:border-divider focus:ring-primary'
+                }`}
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={e => {
+                  setPassword(e.target.value);
+                  if (fieldErrors.password) {
+                    setFieldErrors({ ...fieldErrors, password: undefined });
+                  }
+                }}
                 disabled={loading || submitting}
                 required
                 autoComplete="current-password"
+                aria-invalid={!!fieldErrors.password}
+                aria-describedby={fieldErrors.password ? 'password-error' : undefined}
               />
               <button
                 type="button"
@@ -99,8 +145,19 @@ const LoginPage: React.FC = () => {
                 {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
+            {fieldErrors.password && (
+              <p id="password-error" className="mt-1 text-sm text-danger dark:text-danger" role="alert">
+                {fieldErrors.password}
+              </p>
+            )}
           </div>
-          {formError && <p className="mb-4 text-danger dark:text-danger font-medium">{formError}</p>}
+          {formError && !fieldErrors.email && !fieldErrors.password && (
+            <div className="mb-4 p-3 bg-danger/10 dark:bg-danger/20 border border-danger/20 dark:border-danger/30 rounded-lg">
+              <p className="text-danger dark:text-danger font-medium text-sm" role="alert">
+                {formError}
+              </p>
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading || submitting}

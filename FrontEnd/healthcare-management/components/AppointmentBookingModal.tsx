@@ -1,8 +1,10 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { DoctorRecommendation, AppointmentConfirmation } from '@/types';
-import { getAIRecommendations, bookAppointment } from '@/lib/api';
+import { getAIRecommendations, bookAppointment, fetchDoctors } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
+import { getAuthToken } from '@/lib/cookies';
+import { getSemanticErrorMessage, getFieldErrorMessage } from '@/lib/errorMessages';
 
 interface AppointmentBookingModalProps {
   isOpen: boolean;
@@ -22,25 +24,45 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
   const [symptoms, setSymptoms] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
-  const [recommendedDoctors, setRecommendedDoctors] = useState<DoctorRecommendation[]>([]);
+  const [allDoctors, setAllDoctors] = useState<DoctorRecommendation[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ doctor?: string; date?: string; time?: string; symptoms?: string }>({});
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const loadDoctors = async () => {
+    setLoadingDoctors(true);
+    setError(null);
+    try {
+      const doctors = await fetchDoctors();
+      setAllDoctors(doctors);
+      if (doctors.length > 0) {
+        setSelectedDoctorId(doctors[0].id.toString());
+      }
+    } catch (err) {
+      setError((err as Error).message || 'Failed to load doctors');
+    } finally {
+      setLoadingDoctors(false);
+    }
+  };
+
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      loadDoctors();
+    } else {
       setSymptoms('');
       setDate('');
       setTime('');
-      setRecommendedDoctors([]);
       setSelectedDoctorId('');
       setError(null);
       setSuccessMsg(null);
       setLoadingRecommendations(false);
       setBookingLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const handleSymptomsChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -62,19 +84,28 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
   const fetchRecommendations = async () => {
     setError(null);
     setSuccessMsg(null);
+    setFieldErrors({});
     if (!symptoms.trim()) {
-      setError('Please enter symptoms to get recommendations.');
+      setFieldErrors({ symptoms: 'Please describe your symptoms to get AI recommendations' });
       return;
     }
     setLoadingRecommendations(true);
     try {
-      const doctors = await getAIRecommendations(symptoms.trim());
-      setRecommendedDoctors(doctors);
-      if (doctors.length > 0) {
-        setSelectedDoctorId(doctors[0].id.toString());
+      const recommendedDoctors = await getAIRecommendations(symptoms.trim());
+      if (recommendedDoctors.length > 0) {
+        // Select the first recommended doctor (best fit)
+        setSelectedDoctorId(recommendedDoctors[0].id.toString());
+        setSuccessMsg(`AI recommends: ${recommendedDoctors[0].name} (${recommendedDoctors[0].specialization})`);
+      } else {
+        setError('No doctor recommendations found based on your symptoms. Please select a doctor manually from the list above.');
       }
     } catch (err) {
-      setError((err as Error).message || 'Failed to fetch recommendations');
+      const semanticError = getSemanticErrorMessage(err);
+      setError(semanticError);
+      const symptomsError = getFieldErrorMessage(err, 'symptoms');
+      if (symptomsError) {
+        setFieldErrors({ symptoms: symptomsError });
+      }
     } finally {
       setLoadingRecommendations(false);
     }
@@ -84,38 +115,78 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
     e.preventDefault();
     setError(null);
     setSuccessMsg(null);
+    setFieldErrors({});
 
-    if (!symptoms.trim() || !date || !time || !selectedDoctorId) {
-      setError('Please fill in all required fields and select a doctor.');
+    const errors: { doctor?: string; date?: string; time?: string } = {};
+    let isValid = true;
+
+    if (!selectedDoctorId) {
+      errors.doctor = 'Please select a doctor for your appointment';
+      isValid = false;
+    }
+
+    if (!date) {
+      errors.date = 'Please select an appointment date';
+      isValid = false;
+    } else {
+      const selectedDate = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        errors.date = 'Appointment date cannot be in the past';
+        isValid = false;
+      }
+    }
+
+    if (!time) {
+      errors.time = 'Please select a time slot for your appointment';
+      isValid = false;
+    }
+
+    if (!isValid) {
+      setFieldErrors(errors);
       return;
     }
 
     if (!user) {
-      setError('You must be logged in to book an appointment.');
+      setError('You must be logged in to book an appointment. Please log in and try again.');
       return;
     }
 
     setBookingLoading(true);
     try {
+      const token = getAuthToken();
+      if (!token) {
+        setError('Your session has expired. Please log in again.');
+        setBookingLoading(false);
+        return;
+      }
       const confirmation: AppointmentConfirmation = await bookAppointment(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        localStorage.getItem('healthcare_token')!,
+        token,
         {
           date,
           time,
           doctorId: selectedDoctorId
         }
       );
-      setSuccessMsg(`Appointment booked successfully! ID: ${confirmation.appointmentId}`);
-      onClose();
-      router.push(`/appointments?highlight=${confirmation.appointmentId}`);
-      setSymptoms('');
-      setDate('');
-      setTime('');
-      setRecommendedDoctors([]);
-      setSelectedDoctorId('');
+      setSuccessMsg(`Appointment booked successfully! Appointment ID: ${confirmation.appointmentId}`);
+      setTimeout(() => {
+        onClose();
+        router.push(`/appointments?highlight=${confirmation.appointmentId}`);
+      }, 1500);
     } catch (err) {
-      setError((err as Error).message || 'Failed to book appointment');
+      const semanticError = getSemanticErrorMessage(err);
+      setError(semanticError);
+      
+      // Set field-specific errors if available
+      const doctorError = getFieldErrorMessage(err, 'doctor');
+      const dateError = getFieldErrorMessage(err, 'date');
+      const timeError = getFieldErrorMessage(err, 'time');
+      setFieldErrors({
+        ...(doctorError && { doctor: doctorError }),
+        ...(dateError && { date: dateError }),
+        ...(timeError && { time: timeError })
+      });
     } finally {
       setBookingLoading(false);
     }
@@ -137,52 +208,104 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
         <h2 className="text-xl font-semibold mb-4 text-text-primary dark:text-text-primary">Book New Appointment</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label htmlFor="doctor" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
+              Select Doctor <span className="text-danger dark:text-danger">*</span>
+            </label>
+            {loadingDoctors ? (
+              <p className="text-text-secondary dark:text-text-secondary">Loading doctors...</p>
+            ) : allDoctors.length > 0 ? (
+              <>
+                <ul className={`max-h-48 overflow-y-auto border rounded-lg p-2 space-y-2 bg-surface dark:bg-surface transition-colors ${
+                  fieldErrors.doctor
+                    ? 'border-danger dark:border-danger'
+                    : 'border-border dark:border-divider'
+                }`}>
+                  {allDoctors.map(doctor => (
+                    <li key={doctor.id} className="flex items-center space-x-3 p-2 hover:bg-surface-elevated dark:hover:bg-surface rounded transition-colors">
+                      <input
+                        type="radio"
+                        id={`doctor-${doctor.id}`}
+                        name="selectedDoctor"
+                        value={doctor.id.toString()}
+                        checked={selectedDoctorId === doctor.id.toString()}
+                        onChange={() => {
+                          handleDoctorSelect(doctor.id.toString());
+                          if (fieldErrors.doctor) {
+                            setFieldErrors({ ...fieldErrors, doctor: undefined });
+                          }
+                        }}
+                        className="accent-primary"
+                        required
+                        aria-invalid={!!fieldErrors.doctor}
+                      />
+                      <label htmlFor={`doctor-${doctor.id}`} className="flex-grow cursor-pointer text-text-primary dark:text-text-primary">
+                        <span className="font-semibold">{doctor.name}</span> - <span className="text-text-secondary dark:text-text-secondary">{doctor.specialization}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+                {fieldErrors.doctor && (
+                  <p id="doctor-error" className="mt-1 text-sm text-danger dark:text-danger" role="alert">
+                    {fieldErrors.doctor}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-text-secondary dark:text-text-secondary">No doctors available</p>
+            )}
+          </div>
+          <div>
             <label htmlFor="symptoms" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
-              Symptoms <span className="text-danger dark:text-danger">*</span>
+              Symptoms (for AI recommendation)
             </label>
             <textarea
               id="symptoms"
               name="symptoms"
               rows={3}
-              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+              className={`w-full border rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 transition-colors ${
+                fieldErrors.symptoms
+                  ? 'border-danger dark:border-danger focus:ring-danger'
+                  : 'border-border dark:border-divider focus:ring-primary'
+              }`}
               value={symptoms}
-              onChange={handleSymptomsChange}
-              required
+              onChange={e => {
+                handleSymptomsChange(e);
+                if (fieldErrors.symptoms) {
+                  setFieldErrors({ ...fieldErrors, symptoms: undefined });
+                }
+              }}
+              placeholder="Enter your symptoms to get AI recommendation"
+              aria-invalid={!!fieldErrors.symptoms}
+              aria-describedby={fieldErrors.symptoms ? 'symptoms-error' : undefined}
             />
+            {fieldErrors.symptoms && (
+              <p id="symptoms-error" className="mt-1 text-sm text-danger dark:text-danger" role="alert">
+                {fieldErrors.symptoms}
+              </p>
+            )}
           </div>
           <div>
             <button
               type="button"
               onClick={fetchRecommendations}
-              disabled={loadingRecommendations}
+              disabled={loadingRecommendations || !symptoms.trim()}
               className="bg-secondary dark:bg-secondary-dark text-white px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity font-medium"
             >
-              {loadingRecommendations ? 'Fetching Recommendations...' : 'Get Doctor Recommendations'}
+              {loadingRecommendations ? 'Getting Recommendation...' : 'Get Recommendation with AI'}
             </button>
           </div>
-          {error && <div className="text-danger dark:text-danger font-medium">{error}</div>}
-          {recommendedDoctors.length > 0 && (
-            <div>
-              <p className="font-medium mb-2 text-text-primary dark:text-text-primary">Recommended Doctors:</p>
-              <ul className="max-h-48 overflow-y-auto border border-border dark:border-divider rounded-lg p-2 space-y-2 bg-surface dark:bg-surface transition-colors">
-                {recommendedDoctors.map(doctor => (
-                  <li key={doctor.id} className="flex items-center space-x-3 p-2 hover:bg-surface-elevated dark:hover:bg-surface rounded transition-colors">
-                    <input
-                      type="radio"
-                      id={`doctor-${doctor.id}`}
-                      name="selectedDoctor"
-                      value={doctor.id.toString()}
-                      checked={selectedDoctorId === doctor.id.toString()}
-                      onChange={() => handleDoctorSelect(doctor.id.toString())}
-                      className="accent-primary"
-                      required
-                    />
-                    <label htmlFor={`doctor-${doctor.id}`} className="flex-grow cursor-pointer text-text-primary dark:text-text-primary">
-                      <span className="font-semibold">{doctor.name}</span> - <span className="text-text-secondary dark:text-text-secondary">{doctor.specialization}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
+          {error && !fieldErrors.doctor && !fieldErrors.date && !fieldErrors.time && !fieldErrors.symptoms && (
+            <div className="p-3 bg-danger/10 dark:bg-danger/20 border border-danger/20 dark:border-danger/30 rounded-lg">
+              <p className="text-danger dark:text-danger font-medium text-sm" role="alert">
+                {error}
+              </p>
+            </div>
+          )}
+          {successMsg && (
+            <div className="p-3 bg-success/10 dark:bg-success/20 border border-success/20 dark:border-success/30 rounded-lg">
+              <p className="text-success dark:text-success font-medium text-sm" role="alert">
+                {successMsg}
+              </p>
             </div>
           )}
           <div>
@@ -193,12 +316,28 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
               id="date"
               name="date"
               type="date"
-              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+              className={`w-full border rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 transition-colors ${
+                fieldErrors.date
+                  ? 'border-danger dark:border-danger focus:ring-danger'
+                  : 'border-border dark:border-divider focus:ring-primary'
+              }`}
               value={date}
-              onChange={handleDateChange}
+              onChange={e => {
+                handleDateChange(e);
+                if (fieldErrors.date) {
+                  setFieldErrors({ ...fieldErrors, date: undefined });
+                }
+              }}
               min={new Date().toISOString().split('T')[0]}
               required
+              aria-invalid={!!fieldErrors.date}
+              aria-describedby={fieldErrors.date ? 'date-error' : undefined}
             />
+            {fieldErrors.date && (
+              <p id="date-error" className="mt-1 text-sm text-danger dark:text-danger" role="alert">
+                {fieldErrors.date}
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="time" className="block font-medium mb-1 text-text-primary dark:text-text-primary">
@@ -207,10 +346,21 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
             <select
               id="time"
               name="time"
-              className="w-full border border-border dark:border-divider rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+              className={`w-full border rounded-lg px-3 py-2 bg-surface dark:bg-surface text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 transition-colors ${
+                fieldErrors.time
+                  ? 'border-danger dark:border-danger focus:ring-danger'
+                  : 'border-border dark:border-divider focus:ring-primary'
+              }`}
               value={time}
-              onChange={handleTimeChange}
+              onChange={e => {
+                handleTimeChange(e);
+                if (fieldErrors.time) {
+                  setFieldErrors({ ...fieldErrors, time: undefined });
+                }
+              }}
               required
+              aria-invalid={!!fieldErrors.time}
+              aria-describedby={fieldErrors.time ? 'time-error' : undefined}
             >
               <option value="">Select a time slot</option>
               {timeSlots.map(slot => (
@@ -219,6 +369,11 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
                 </option>
               ))}
             </select>
+            {fieldErrors.time && (
+              <p id="time-error" className="mt-1 text-sm text-danger dark:text-danger" role="alert">
+                {fieldErrors.time}
+              </p>
+            )}
           </div>
           <div className="flex justify-end space-x-2">
             <button
@@ -236,7 +391,6 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
               {bookingLoading ? 'Booking...' : 'Book Appointment'}
             </button>
           </div>
-          {successMsg && <p className="text-success dark:text-success font-medium">{successMsg}</p>}
         </form>
       </div>
     </div>

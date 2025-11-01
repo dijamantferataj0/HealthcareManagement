@@ -4,6 +4,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
 import { Appointment } from '@/types';
 import { fetchAppointments, cancelAppointment } from '@/lib/api';
+import { getAuthToken } from '@/lib/cookies';
+import { API_ENDPOINTS } from '@/lib/constants';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const ManageAppointmentsPage: React.FC = () => {
   const { user, loading } = useAuth();
@@ -27,7 +31,7 @@ const ManageAppointmentsPage: React.FC = () => {
     setLoadingAppointments(true);
     setError(null);
     try {
-      const token = localStorage.getItem('healthcare_token');
+      const token = getAuthToken();
       if (!token) {
         setError('Authentication token missing');
         setAppointments([]);
@@ -52,7 +56,7 @@ const ManageAppointmentsPage: React.FC = () => {
     if (!confirm) return;
     try {
       setCancellingId(id);
-      const token = localStorage.getItem('healthcare_token');
+      const token = getAuthToken();
       if (!token) throw new Error('Authentication token missing');
       await cancelAppointment(token, id);
       await load();
@@ -78,10 +82,10 @@ const ManageAppointmentsPage: React.FC = () => {
   const saveEdit = async () => {
     if (!editingId || !editDate || !editTime) return;
     try {
-      const token = localStorage.getItem('healthcare_token');
+      const token = getAuthToken();
       if (!token) throw new Error('Authentication token missing');
       const iso = new Date(`${editDate}T${editTime}:00`).toISOString();
-      const res = await fetch(`/api/appointments/${editingId}`, {
+      const res = await fetch(`${API_URL}${API_ENDPOINTS.APPOINTMENTS}/${editingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -89,6 +93,14 @@ const ManageAppointmentsPage: React.FC = () => {
         },
         body: JSON.stringify({ appointmentDate: iso })
       });
+      // Handle 401 Unauthorized (expired token)
+      if (res.status === 401 && typeof window !== 'undefined') {
+        const { removeTokenCookie } = await import('@/lib/cookies');
+        removeTokenCookie();
+        localStorage.removeItem('healthcare_token');
+        window.location.href = '/login';
+        throw new Error('Your session has expired. Please log in again.');
+      }
       if (!res.ok && res.status !== 204) {
         const errJson = await res.json().catch(() => null);
         throw new Error(errJson?.message || res.statusText || 'Failed to update appointment');

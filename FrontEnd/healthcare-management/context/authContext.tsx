@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { User, RegisterPayload } from '@/types';
 import * as api from '@/lib/api';
+import { setTokenCookie, getAuthToken, removeTokenCookie } from '@/lib/cookies';
 
 interface AuthContextType {
   user: User | null;
@@ -22,7 +23,6 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const STORAGE_KEY = 'healthcare_token';
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await api.login(email, password);
       const token = (response as any).token ?? (response as any).Token;
       if (!token) throw new Error('Invalid login response');
-      localStorage.setItem(STORAGE_KEY, token);
+      setTokenCookie(token);
       try {
         const payload = JSON.parse(atob(token.split('.')[1] || ''));
         const userFromToken: User = {
@@ -67,21 +67,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    removeTokenCookie();
+    // Also clear localStorage if it exists (for cleanup)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('healthcare_token');
+    }
     setUser(null);
   };
 
   useEffect(() => {
     async function autoLogin() {
-      const token = localStorage.getItem(STORAGE_KEY);
+      const token = getAuthToken();
       if (!token) {
         setLoading(false);
         return;
       }
       try {
+        // Token is already validated for expiration in getAuthToken()
+        // Decode token to get user info
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1] || ''));
+          const userFromToken: User = {
+            id: String(payload.sub ?? ''),
+            name: String(payload.name ?? ''),
+            email: String(payload.unique_name ?? '')
+          };
+          setUser(userFromToken);
+        } catch {
+          // Invalid token format, clear it
+          removeTokenCookie();
+          setUser(null);
+        }
         setLoading(false);
       } catch {
-        localStorage.removeItem(STORAGE_KEY);
+        removeTokenCookie();
         setUser(null);
         setLoading(false);
       }

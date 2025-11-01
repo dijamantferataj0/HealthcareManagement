@@ -3,6 +3,7 @@ export const API_ENDPOINTS = {
   REGISTER: '/api/auth/register',
   APPOINTMENTS: '/api/appointments',
   BOOK_APPOINTMENT: '/api/appointments',
+  DOCTORS: '/api/doctors',
   AI_RECOMMENDATIONS: '/api/doctors/recommend'
 };
 

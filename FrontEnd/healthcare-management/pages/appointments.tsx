@@ -5,6 +5,7 @@ import { Appointment } from '@/types';
 import { fetchAppointments } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
+import { getAuthToken } from '@/lib/cookies';
 
 const AppointmentsPage: React.FC = () => {
   const { user, loading } = useAuth();
@@ -27,7 +28,7 @@ const AppointmentsPage: React.FC = () => {
       setLoadingAppointments(true);
       setError(null);
       try {
-        const token = localStorage.getItem('healthcare_token');
+        const token = getAuthToken();
         if (!token) {
           setError('Authentication token missing');
           setAppointments([]);

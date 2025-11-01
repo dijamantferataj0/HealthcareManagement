@@ -71,11 +71,12 @@ namespace HealthcareManagement.Service
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expirationHours = _configuration.GetValue<int>("Jwt:ExpirationHours", 24); // Default to 24 hours if not configured
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddHours(8),
+                expires: DateTime.Now.AddHours(expirationHours),
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
