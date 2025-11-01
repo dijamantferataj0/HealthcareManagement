@@ -1,30 +1,29 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Multi-stage build for .NET 9 API
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
+# Copy solution and project files
+COPY ["HealthcareManagement/HealthcareManagement.csproj", "HealthcareManagement/"]
+COPY ["HealthcareManagement.Service/HealthcareManagement.Service.csproj", "HealthcareManagement.Service/"]
+COPY ["HealthcareManagement.Domain/HealthcareManagement.Domain.csproj", "HealthcareManagement.Domain/"]
+COPY ["HealthcareManagement.Persistence/HealthcareManagement.Persistence.csproj", "HealthcareManagement.Persistence/"]
+
+# Restore dependencies
+RUN dotnet restore "HealthcareManagement/HealthcareManagement.csproj"
+
+# Copy all source files
+COPY . .
+
+# Build and publish
+WORKDIR "/src/HealthcareManagement"
+RUN dotnet build "HealthcareManagement.csproj" -c Release -o /app/build
+RUN dotnet publish "HealthcareManagement.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Final stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["HealthcareManagement/HealthcareManagement.csproj", "HealthcareManagement/"]
-RUN dotnet restore "./HealthcareManagement/HealthcareManagement.csproj"
-COPY . .
-WORKDIR "/src/HealthcareManagement"
-RUN dotnet build "./HealthcareManagement.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./HealthcareManagement.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "HealthcareManagement.dll"]

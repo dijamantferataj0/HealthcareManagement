@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: healthcare-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-healthcare_db}
+      POSTGRES_USER: ${POSTGRES_USER:-healthcare_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-healthcare_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-healthcare_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - healthcare-network
+
+  # Backend API (.NET 9)
+  backend:
+    build:
+      context: ./BackEnd/HealthcareManagement
+      dockerfile: HealthcareManagement/Dockerfile
+    container_name: healthcare-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-healthcare_db};Username=${POSTGRES_USER:-healthcare_user};Password=${POSTGRES_PASSWORD:-healthcare_password}
+      - Jwt__Key=${JWT_KEY:-VDYfrLsFgh12XiZKALqz6vPlwBqywVT8HpGSZwZoLoU=}
+      - Jwt__Issuer=${JWT_ISSUER:-HealthcareApi}
+      - Jwt__Audience=${JWT_AUDIENCE:-HealthcareApiUsers}
+      - Jwt__ExpirationHours=${JWT_EXPIRATION_HOURS:-24}
+      - Cors__AllowedOrigins__0=http://localhost:3000
+      - Cors__AllowedOrigins__1=http://127.0.0.1:3000
+      - OpenAI__ApiKey=${OPENAI_API_KEY:-}
+      - OpenAI__Model=${OPENAI_MODEL:-gpt-4o-mini}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+      - "${BACKEND_HTTPS_PORT:-8081}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+    restart: unless-stopped
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./FrontEnd/healthcare-management
+      dockerfile: Dockerfile
+    container_name: healthcare-frontend
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${FRONTEND_API_URL:-http://localhost:8080}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
+    networks:
+      - healthcare-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  healthcare-network:
+    driver: bridge
+
