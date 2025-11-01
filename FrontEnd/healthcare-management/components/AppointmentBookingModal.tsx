@@ -266,7 +266,7 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
                         checked={selectedDoctorId === doctor.id.toString()}
                         onChange={() => {
                           handleDoctorSelect(doctor.id.toString());
-                          // When a doctor is selected, they have a value, so clear any error
+                          // When a doctor is selected, immediately clear error since selection is valid
                           if (fieldErrors.doctor) {
                             setFieldErrors({ ...fieldErrors, doctor: undefined });
                           }
@@ -361,9 +361,7 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
               value={date}
               onChange={e => {
                 handleDateChange(e);
-                if (fieldErrors.date && validateDate(e.target.value) === undefined) {
-                  setFieldErrors({ ...fieldErrors, date: undefined });
-                }
+                // Don't clear errors while typing - wait for blur
               }}
               onBlur={handleDateBlur}
               min={new Date().toISOString().split('T')[0]}
@@ -392,9 +390,7 @@ const AppointmentBookingModal: React.FC<AppointmentBookingModalProps> = ({ isOpe
               value={time}
               onChange={e => {
                 handleTimeChange(e);
-                if (fieldErrors.time && validateTime(e.target.value) === undefined) {
-                  setFieldErrors({ ...fieldErrors, time: undefined });
-                }
+                // Don't clear errors while typing - wait for blur
               }}
               onBlur={handleTimeBlur}
               required

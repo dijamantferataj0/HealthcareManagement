@@ -141,9 +141,7 @@ const RegisterPage: React.FC = () => {
               value={name}
               onChange={e => {
                 setName(e.target.value);
-                if (fieldErrors.name && validateName(e.target.value) === undefined) {
-                  setFieldErrors({ ...fieldErrors, name: undefined });
-                }
+                // Don't clear errors while typing - wait for blur
               }}
               onBlur={() => {
                 const error = validateName(name);
@@ -177,9 +175,7 @@ const RegisterPage: React.FC = () => {
               value={email}
               onChange={e => {
                 setEmail(e.target.value);
-                if (fieldErrors.email && validateEmail(e.target.value) === undefined) {
-                  setFieldErrors({ ...fieldErrors, email: undefined });
-                }
+                // Don't clear errors while typing - wait for blur
               }}
               onBlur={() => {
                 const error = validateEmail(email);
@@ -214,9 +210,7 @@ const RegisterPage: React.FC = () => {
                 value={password}
                 onChange={e => {
                   setPassword(e.target.value);
-                  if (fieldErrors.password && validatePassword(e.target.value) === undefined) {
-                    setFieldErrors({ ...fieldErrors, password: undefined });
-                  }
+                  // Don't clear errors while typing - wait for blur
                   // Clear confirm password error if passwords now match
                   if (fieldErrors.confirmPassword && e.target.value === confirmPassword) {
                     setFieldErrors({ ...fieldErrors, confirmPassword: undefined });
@@ -264,9 +258,7 @@ const RegisterPage: React.FC = () => {
                 value={confirmPassword}
                 onChange={e => {
                   setConfirmPassword(e.target.value);
-                  if (fieldErrors.confirmPassword && validateConfirmPassword(e.target.value, password) === undefined) {
-                    setFieldErrors({ ...fieldErrors, confirmPassword: undefined });
-                  }
+                  // Don't clear errors while typing - wait for blur
                 }}
                 onBlur={() => {
                   const error = validateConfirmPassword(confirmPassword, password);

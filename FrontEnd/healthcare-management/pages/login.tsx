@@ -107,10 +107,7 @@ const LoginPage: React.FC = () => {
               value={email}
               onChange={e => {
                 setEmail(e.target.value);
-                // Only clear error if the field is now valid (returns undefined)
-                if (fieldErrors.email && validateEmail(e.target.value) === undefined) {
-                  setFieldErrors({ ...fieldErrors, email: undefined });
-                }
+                // Don't clear errors while typing - wait for blur
               }}
               onBlur={() => {
                 const error = validateEmail(email);
@@ -145,10 +142,7 @@ const LoginPage: React.FC = () => {
                 value={password}
                 onChange={e => {
                   setPassword(e.target.value);
-                  // Only clear error if the field is now valid (returns undefined)
-                  if (fieldErrors.password && validatePassword(e.target.value) === undefined) {
-                    setFieldErrors({ ...fieldErrors, password: undefined });
-                  }
+                  // Don't clear errors while typing - wait for blur
                 }}
                 onBlur={() => {
                   const error = validatePassword(password);
