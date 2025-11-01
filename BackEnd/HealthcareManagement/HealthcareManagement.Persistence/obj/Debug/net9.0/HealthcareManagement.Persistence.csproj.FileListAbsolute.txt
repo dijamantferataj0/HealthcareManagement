@@ -1,0 +1,15 @@
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\bin\Debug\net9.0\HealthcareManagement.Persistence.deps.json
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\bin\Debug\net9.0\HealthcareManagement.Persistence.dll
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\bin\Debug\net9.0\HealthcareManagement.Persistence.pdb
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\bin\Debug\net9.0\HealthcareManagement.Domain.dll
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\bin\Debug\net9.0\HealthcareManagement.Domain.pdb
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.csproj.AssemblyReference.cache
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.AssemblyInfoInputs.cache
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.AssemblyInfo.cs
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.csproj.CoreCompileInputs.cache
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\Healthca.100E8419.Up2Date
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.dll
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\refint\HealthcareManagement.Persistence.dll
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\HealthcareManagement.Persistence.pdb
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Persistence\obj\Debug\net9.0\ref\HealthcareManagement.Persistence.dll

@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* App theme tokens ported from test project */
+  --color-primary: #2563EB;
+  --color-secondary: #10B981;
+  --color-danger: #EF4444;
+  --color-background: #F9FAFB;
+  --color-textPrimary: #111827;
+  --color-textSecondary: #6B7280;
+
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* expose custom colors to Tailwind tokens */
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-danger: var(--color-danger);
+  --color-textPrimary: var(--color-textPrimary);
+  --color-textSecondary: var(--color-textSecondary);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-heading);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-textPrimary);
+  font-family: var(--font-sans);
+}
+
+
