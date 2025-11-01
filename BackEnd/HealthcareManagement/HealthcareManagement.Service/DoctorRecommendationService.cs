@@ -1,5 +1,6 @@
 using HealthcareManagement.Domain.Models;
 using HealthcareManagement.Persistence;
+using HealthcareManagement.Service.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -28,10 +29,10 @@ namespace HealthcareManagement.Service
             _configuration = configuration;
         }
 
-        public async Task<List<Doctor>> GetRecommendedDoctorsAsync(string symptoms)
+        public async Task<List<DoctorDto>> GetRecommendedDoctorsAsync(string symptoms)
         {
             if (string.IsNullOrWhiteSpace(symptoms))
-                return new List<Doctor>();
+                return new List<DoctorDto>();
 
             var allDoctors = await _context.Doctors
                 .Include(d => d.DoctorSpecializations)
@@ -42,18 +43,35 @@ namespace HealthcareManagement.Service
             var apiKey = _configuration["OpenAI:ApiKey"];
             var model = _configuration["OpenAI:Model"] ?? "gpt-4o-mini";
 
+            List<Doctor> recommendedDoctors;
             if (!string.IsNullOrWhiteSpace(apiKey))
             {
                 var aiMatches = await GetAIRecommendedDoctorsAsync(allDoctors, symptoms, apiKey, model);
                 if (aiMatches != null && aiMatches.Count > 0)
-                    return aiMatches;
+                {
+                    recommendedDoctors = aiMatches;
+                }
+                else
+                {
+                    recommendedDoctors = GetTagBasedRecommendedDoctors(allDoctors, symptoms);
+                }
+            }
+            else
+            {
+                recommendedDoctors = GetTagBasedRecommendedDoctors(allDoctors, symptoms);
             }
 
-            // Fallback to tag-based matching
-            return GetTagBasedRecommendedDoctors(allDoctors, symptoms);
+            // Convert to DTOs
+            return recommendedDoctors.Select(d => new DoctorDto
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Specializations = d.DoctorSpecializations?.Select(ds => ds.Specialization.Name).ToList() ?? new List<string>(),
+                Specialization = string.Join(", ", d.DoctorSpecializations?.Select(ds => ds.Specialization.Name) ?? Enumerable.Empty<string>())
+            }).ToList();
         }
 
-        private async Task<List<Doctor>> GetAIRecommendedDoctorsAsync(
+        private async Task<List<Doctor>?> GetAIRecommendedDoctorsAsync(
             List<Doctor> allDoctors,
             string symptoms,
             string apiKey,
@@ -125,7 +143,7 @@ namespace HealthcareManagement.Service
             }
         }
 
-        private List<string> ParseAIResponse(string content)
+        private List<string> ParseAIResponse(string? content)
         {
             var recommended = new List<string>();
             if (string.IsNullOrWhiteSpace(content))

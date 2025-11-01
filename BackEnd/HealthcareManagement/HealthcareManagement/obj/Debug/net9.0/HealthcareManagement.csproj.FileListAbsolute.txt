@@ -133,6 +133,7 @@ C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.csproj.CoreCompileInputs.cache
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.sourcelink.json
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
@@ -141,11 +142,10 @@ C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\staticwebassets.development.json
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\staticwebassets.build.endpoints.json
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\Healthca.004A247D.Up2Date
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.dll
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\refint\HealthcareManagement.dll
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.pdb
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.genruntimeconfig.cache
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\ref\HealthcareManagement.dll
-C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
-C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement\obj\Debug\net9.0\HealthcareManagement.sourcelink.json

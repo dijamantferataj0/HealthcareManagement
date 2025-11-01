@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HealthcareManagement.Domain.Models;
+using HealthcareManagement.Service.DTOs;
 
 namespace HealthcareManagement.Service
 {
     public interface IDoctorService
     {
-        Task<List<Doctor>> GetAllDoctorsAsync();
+        Task<List<DoctorDto>> GetAllDoctorsAsync();
     }
 }

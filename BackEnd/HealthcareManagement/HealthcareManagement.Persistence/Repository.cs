@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -9,18 +8,41 @@ namespace HealthcareManagement.Persistence
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        protected readonly HealthcareDbContext _context;
-        protected readonly DbSet<T> _dbSet;
+        private readonly HealthcareDbContext _context;
         public Repository(HealthcareDbContext context)
         {
             _context = context;
-            _dbSet = _context.Set<T>();
         }
-        public async Task<T> GetByIdAsync(object id) => await _dbSet.FindAsync(id);
-        public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
-        public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
-        public void Update(T entity) => _dbSet.Update(entity);
-        public void Remove(T entity) => _dbSet.Remove(entity);
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate) => await _dbSet.Where(predicate).ToListAsync();
+        public IQueryable<T> GetByCondition(Expression<Func<T, bool>> condition) => _context.Set<T>().Where(condition);
+
+        public IQueryable<T> GetByConditionWithIncludes(Expression<Func<T, bool>> expression, string? includeRelations = null)
+        {
+            var query = _context.Set<T>().Where(expression);
+
+            if (!string.IsNullOrEmpty(includeRelations))
+            {
+                var relations = includeRelations.Split(", ");
+
+                foreach (var relation in relations)
+                {
+                    query = query.Include(relation);
+                }
+            }
+
+            return query;
+        }
+        public IQueryable<T> GetAll() => _context.Set<T>();
+        public IQueryable<T> GetById(Expression<Func<T, bool>> condition) => _context.Set<T>().Where(condition);
+        public async Task CreateAsync(T entity) => await _context.Set<T>().AddAsync(entity);
+        public async Task CreateRangeAsync(List<T> entities) => await _context.Set<T>().AddRangeAsync(entities);
+        public void Create(T entity) => _context.Set<T>().Add(entity);
+        public void CreateRange(List<T> entities) => _context.Set<T>().AddRange(entities);
+        public void Delete(T entity) => _context.Set<T>().Remove(entity);
+        public void DeleteRange(List<T> entities) => _context.Set<T>().RemoveRange(entities);
+        public async Task DeleteWithConditionAsync(Expression<Func<T, bool>> condition) => await _context.Set<T>().Where(condition).ExecuteDeleteAsync();
+        public void Update(T entity) => _context.Set<T>().Update(entity);
+        public void UpdateRange(List<T> entities) => _context.Set<T>().UpdateRange(entities);
+
+
     }
 }

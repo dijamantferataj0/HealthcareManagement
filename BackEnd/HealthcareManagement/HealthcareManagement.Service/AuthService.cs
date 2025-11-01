@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthcareManagement.Service
 {
@@ -35,10 +36,10 @@ namespace HealthcareManagement.Service
             if (!IsStrongPassword(password))
                 throw new ArgumentException("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
             var normalizedEmail = email.Trim().ToLower();
-            var exists = (await _unitOfWork.Patients.FindAsync(x => x.Email == normalizedEmail)).Any();
+            var exists = await _unitOfWork.Patients.GetByCondition(x => x.Email == normalizedEmail).AnyAsync();
             if (exists) throw new Exception("Email already registered");
             var patient = new Patient { Name = name, Email = normalizedEmail, PasswordHash = HashPassword(password) };
-            await _unitOfWork.Patients.AddAsync(patient);
+            await _unitOfWork.Patients.CreateAsync(patient);
             await _unitOfWork.SaveChangesAsync();
             return patient.Id;
         }
@@ -50,7 +51,7 @@ namespace HealthcareManagement.Service
                 throw new ArgumentException("Password is required.");
             var normalizedEmail = email.Trim().ToLower();
             var passwordHash = HashPassword(password);
-            var user = (await _unitOfWork.Patients.FindAsync(u => u.Email == normalizedEmail && u.PasswordHash == passwordHash)).FirstOrDefault();
+            var user = await _unitOfWork.Patients.GetByCondition(u => u.Email == normalizedEmail && u.PasswordHash == passwordHash).FirstOrDefaultAsync();
             if (user == null) throw new Exception("Invalid credentials");
             return GenerateJwt(user);
         }

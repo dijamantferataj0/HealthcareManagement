@@ -38,14 +38,15 @@ namespace HealthcareManagement.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var recommendedDoctors = await _recommendationService.GetRecommendedDoctorsAsync(request.Symptoms);
+            var serviceDtos = await _recommendationService.GetRecommendedDoctorsAsync(request.Symptoms);
 
-            var result = recommendedDoctors.Select(d => new DoctorDto
+            // Map Service DTOs to Feature DTOs
+            var result = serviceDtos.Select(d => new DoctorDto
             {
                 Id = d.Id,
                 Name = d.Name,
-                Specializations = d.DoctorSpecializations?.Select(ds => ds.Specialization.Name).ToList() ?? new List<string>(),
-                Specialization = string.Join(", ", d.DoctorSpecializations?.Select(ds => ds.Specialization.Name) ?? Enumerable.Empty<string>())
+                Specializations = d.Specializations,
+                Specialization = d.Specialization
             }).ToList();
 
             return Ok(result);

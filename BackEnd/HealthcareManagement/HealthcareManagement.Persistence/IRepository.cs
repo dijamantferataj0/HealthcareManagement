@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -7,11 +8,18 @@ namespace HealthcareManagement.Persistence
 {
     public interface IRepository<T> where T : class
     {
-        Task<T> GetByIdAsync(object id);
-        Task<IEnumerable<T>> GetAllAsync();
-        Task AddAsync(T entity);
+        IQueryable<T> GetByCondition(Expression<Func<T, bool>> condition);
+        IQueryable<T> GetByConditionWithIncludes(Expression<Func<T, bool>> expression, string? includeRelations = null);
+        IQueryable<T> GetAll();
+        IQueryable<T> GetById(Expression<Func<T, bool>> condition);
+        Task CreateAsync(T entity);
+        Task CreateRangeAsync(List<T> entities);
+        Task DeleteWithConditionAsync(Expression<Func<T, bool>> condition);
+        void Delete(T entity);
+        void DeleteRange(List<T> entities);
         void Update(T entity);
-        void Remove(T entity);
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        void UpdateRange(List<T> entities);
+
+
     }
 }

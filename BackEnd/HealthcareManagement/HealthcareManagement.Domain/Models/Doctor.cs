@@ -10,10 +10,10 @@ namespace HealthcareManagement.Domain.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Specialization { get; set; }
         public bool Deleted { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public ICollection<Appointment> Appointments { get; set; }
+        public ICollection<DoctorSpecialization> DoctorSpecializations { get; set; }
     }
 }

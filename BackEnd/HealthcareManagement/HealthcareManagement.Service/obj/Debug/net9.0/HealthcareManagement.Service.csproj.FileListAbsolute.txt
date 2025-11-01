@@ -10,9 +10,9 @@ C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\HealthcareManagement.Service.AssemblyInfoInputs.cache
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\HealthcareManagement.Service.AssemblyInfo.cs
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\HealthcareManagement.Service.csproj.CoreCompileInputs.cache
+C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\HealthcareManagement.Service.sourcelink.json
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\Healthca.D8673689.Up2Date
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\HealthcareManagement.Service.dll
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\refint\HealthcareManagement.Service.dll
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\HealthcareManagement.Service.pdb
 C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\ref\HealthcareManagement.Service.dll
-C:\Users\zer0\Desktop\Projects\HealtcareManagement\BackEnd\HealthcareManagement\HealthcareManagement.Service\obj\Debug\net9.0\HealthcareManagement.Service.sourcelink.json

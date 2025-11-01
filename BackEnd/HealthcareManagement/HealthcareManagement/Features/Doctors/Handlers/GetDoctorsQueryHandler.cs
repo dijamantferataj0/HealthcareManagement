@@ -1,10 +1,9 @@
 using MediatR;
-using HealthcareManagement.Domain.Models;
 using HealthcareManagement.Service;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace HealthcareManagement.Features.Doctors.Handlers
 {
@@ -17,8 +16,15 @@ namespace HealthcareManagement.Features.Doctors.Handlers
         }
         public async Task<List<DoctorDto>> Handle(Queries.GetDoctorsQuery request, CancellationToken cancellationToken)
         {
-            var list = await _doctorService.GetAllDoctorsAsync();
-            return list.Select(d => new DoctorDto { Id = d.Id, Name = d.Name, Specialization = d.Specialization }).ToList();
+            var serviceDtos = await _doctorService.GetAllDoctorsAsync();
+            // Map Service DTOs to Feature DTOs
+            return serviceDtos.Select(d => new DoctorDto
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Specializations = d.Specializations,
+                Specialization = d.Specialization
+            }).ToList();
         }
     }
 }
