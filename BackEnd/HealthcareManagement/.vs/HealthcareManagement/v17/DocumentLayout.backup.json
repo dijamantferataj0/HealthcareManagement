@@ -52,7 +52,7 @@
               "RelativeDocumentMoniker": "HealthcareManagement.Persistence\\HealthcareManagementDbContext.cs",
               "ToolTip": "C:\\Users\\zer0\\Desktop\\Projects\\HealtcareManagement\\BackEnd\\HealthcareManagement\\HealthcareManagement.Persistence\\HealthcareManagementDbContext.cs",
               "RelativeToolTip": "HealthcareManagement.Persistence\\HealthcareManagementDbContext.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAiwBQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADIAAAAAAAAAAAAgwBQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-01T08:01:15.294Z",
               "EditorCaption": ""
@@ -65,7 +65,7 @@
               "RelativeDocumentMoniker": "HealthcareManagement.Service\\AuthService.cs",
               "ToolTip": "C:\\Users\\zer0\\Desktop\\Projects\\HealtcareManagement\\BackEnd\\HealthcareManagement\\HealthcareManagement.Service\\AuthService.cs",
               "RelativeToolTip": "HealthcareManagement.Service\\AuthService.cs",
-              "ViewState": "AgIAABkAAAAAAAAAAAD4vzUAAACZAAAAAAAAAA==",
+              "ViewState": "AgIAABkAAAAAAAAAAAAtwDUAAACZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-01T07:55:31.847Z",
               "EditorCaption": ""
@@ -132,7 +132,8 @@
               "RelativeToolTip": "HealthcareManagement.Persistence\\HealthcareManagement.Persistence.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-11-01T06:40:33.274Z"
+              "WhenOpened": "2025-11-01T06:40:33.274Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -142,9 +143,10 @@
               "RelativeDocumentMoniker": "HealthcareManagement\\Properties\\launchSettings.json",
               "ToolTip": "C:\\Users\\zer0\\Desktop\\Projects\\HealtcareManagement\\BackEnd\\HealthcareManagement\\HealthcareManagement\\Properties\\launchSettings.json",
               "RelativeToolTip": "HealthcareManagement\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAAACkAAAAwAAAAAAAAAA==",
+              "ViewState": "AgIAAAsAAAAAAAAAAABRwCkAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-01T02:37:06.951Z"
+              "WhenOpened": "2025-11-01T02:37:06.951Z",
+              "EditorCaption": ""
             }
           ]
         }
