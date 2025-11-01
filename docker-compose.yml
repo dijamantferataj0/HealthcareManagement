@@ -52,10 +52,11 @@ services:
     build:
       context: ./FrontEnd/healthcare-management
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${FRONTEND_API_URL:-http://localhost:8080}
     container_name: healthcare-frontend
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=${FRONTEND_API_URL:-http://localhost:8080}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:

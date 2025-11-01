@@ -279,10 +279,19 @@ On first run, the backend will automatically apply database migrations and seed 
 ### Troubleshooting
 
 - **Port already in use:** Change the port in `.env` file or stop the conflicting service
-- **Database connection issues:** Ensure PostgreSQL container is healthy: `docker-compose ps`
-- **Frontend can't reach backend:** Check that `FRONTEND_API_URL` in `.env` matches your backend URL
-- **View backend logs:** `docker-compose logs backend` to see API errors
-- **Reset everything:** `docker-compose down -v && docker-compose up -d`
+- **Database connection issues:** Ensure PostgreSQL container is healthy: `docker compose ps`
+- **Frontend can't reach backend:** 
+  - Ensure backend is running: `docker compose ps`
+  - Check backend logs: `docker compose logs backend`
+  - Verify CORS is configured correctly (should allow `http://localhost:3000`)
+  - **If you changed `FRONTEND_API_URL` after initial build**, rebuild the frontend:
+    ```bash
+    docker compose build frontend
+    docker compose up -d frontend
+    ```
+- **View backend logs:** `docker compose logs backend` to see API errors
+- **View frontend logs:** `docker compose logs frontend`
+- **Reset everything:** `docker compose down -v && docker compose up -d --build`
 
 ## API Endpoints
 
