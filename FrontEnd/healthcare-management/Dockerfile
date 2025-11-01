@@ -6,8 +6,9 @@ FROM base AS deps
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
-RUN npm ci
+COPY package.json package-lock.json* ./
+# Use npm install which handles out-of-sync lock files gracefully
+RUN npm install
 
 # Rebuild the source code only when needed
 FROM base AS builder
